@@ -18,7 +18,7 @@
   <select id="selectByName" resultType="user">
     select <include refid="selectFields"></include>
     from user
-    where name = #{name}
+    where username = #{username}
   </select>
   <select id="selectByEmail" resultType="user">
     select <include refid="selectFields"></include>
@@ -28,7 +28,7 @@
   <!-- 方法输入的类型不是java能自带的类型，就得指定其类型（全限定名，配置后可简写） keyProperty指明与主键对应的属性名 -->
   <insert id="insertUser" parameterType="User" keyProperty="id">
     insert into user
-    <include refid="insertFields"></include>
+    (<include refid="insertFields"></include>)
     values(#{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl}, #{createTime})
   </insert>
   <update id="updateStatus">

@@ -34,7 +34,7 @@ public class UserService {
     @Value("${community.path.domain}")
     private String domain;
 
-    @Value("${server.servlet.context.path}")
+    @Value("${server.servlet.context-path}")
     private String contextPath;
 
     public User findUserById(int id) {
