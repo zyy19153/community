@@ -2,6 +2,7 @@ package com.nowcoder.community.service;
 
 import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.MailClient;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +22,7 @@ import java.util.Random;
  * @since 2022/7/13 - 15:40
  */
 @Service
-public class UserService {
+public class UserService implements CommunityConstant {
     @Autowired
     private UserMapper userMapper;
 
@@ -34,8 +35,8 @@ public class UserService {
     @Value("${community.path.domain}")
     private String domain;
 
-    @Value("${server.servlet.context-path}")
-    private String contextPath;
+//    @Value("${server.servlet.context-path}")
+//    private String contextPath;
 
     public User findUserById(int id) {
         return userMapper.selectById(id);
@@ -61,11 +62,14 @@ public class UserService {
         User u = userMapper.selectByName(user.getUsername());
         if (u != null) {
             map.put("usernameMsg", "该账号已存在");
+            return map;
         }
         // 验证邮箱
+        // 这里的方案其实不好，当有多个相同邮箱时，此处的返回值就不止一个了。
         u = userMapper.selectByEmail(user.getEmail());
         if (u != null) {
             map.put("emailMsg", "该邮箱已被注册");
+            return map;
         }
         // 注册用户
         user.setSalt(CommunityUtil.generateUUID().substring(0, 5));
@@ -80,10 +84,21 @@ public class UserService {
         Context context = new Context();
         context.setVariable("email", user.getEmail());
         // url: http://localhost:8080/activation/101/code
-        String url = domain + contextPath + "/activation/" + user.getId() + "/" + user.getActivationCode();
+        String url = domain + "/activation/" + user.getId() + "/" + user.getActivationCode();
         context.setVariable("url", url);
         String content = templateEngine.process("/mail/activation", context);
         mailClient.sendMail(user.getEmail(), "激活账号", content);
         return map;
+    }
+
+    public int activation(int userId, String code) {
+        User user = userMapper.selectById(userId);
+        if (user.getStatus() == 1) return ACTIVATION_REPEAT;
+        else if (user.getActivationCode().equals(code)) {
+            userMapper.updateStatus(userId, 1);
+            return ACTIVATION_SUCCESS;
+        } else {
+            return ACTIVATION_FAILURE;
+        }
     }
 }
