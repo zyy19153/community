@@ -18,7 +18,7 @@ public class CommunityUtil {
     // MD5加密
     // hello -> abc123
     // hello + randomString(salt) -> qweqweqwe
-    public static String MD5(String key) {
+    public static String md5(String key) {
         if (StringUtils.isBlank(key)) return null;
         return DigestUtils.md5DigestAsHex(key.getBytes());
     }
