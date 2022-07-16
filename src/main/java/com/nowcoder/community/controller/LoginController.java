@@ -118,8 +118,8 @@ public class LoginController implements CommunityConstant {
             response.addCookie(cookie);
             return "redirect:/index";
         } else {
-            model.addAttribute("username", map.get("usernameMsg"));
-            model.addAttribute("password", map.get("passwordMsg"));
+            model.addAttribute("usernameMsg", map.get("usernameMsg"));
+            model.addAttribute("passwordMsg", map.get("passwordMsg"));
             return "/site/login";
         }
     }

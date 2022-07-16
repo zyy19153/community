@@ -157,4 +157,14 @@ public class UserService implements CommunityConstant {
     public int updateHeader(int userId, String headerUrl) {
         return userMapper.updateHeader(userId, headerUrl);
     }
+
+    public int updatePassword(int userId, String realPassword, String salt, String oldPassword, String newPassword) {
+        // 判断旧密码是否输入正确
+        String md5Password = CommunityUtil.md5(oldPassword + salt);
+        if (!realPassword.equals(md5Password)) {
+            return 0; // 0 - fail
+        }
+        newPassword = CommunityUtil.md5(newPassword + salt); // 注意，使用 mapper 存的密码是已经加过密的密码
+        return userMapper.updatePassword(userId, newPassword);
+    }
 }

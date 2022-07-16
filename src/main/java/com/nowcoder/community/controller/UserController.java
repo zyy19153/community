@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 
 /**
  * @author Hide on bush
@@ -104,5 +105,35 @@ public class UserController {
         } catch (IOException e) {
             logger.error("读取头像失败", e.getMessage());
         }
+    }
+
+    @RequestMapping(path = "/password", method = RequestMethod.POST)
+    public String updatePassword(String oldPassword, String newPassword, String confirmPassword, Model model) {
+        if (StringUtils.isBlank(oldPassword)) {
+            model.addAttribute("oldPasswordMsg", "原始密码不能为空");
+            return "/site/setting";
+        }
+        if (StringUtils.isBlank(newPassword)) {
+            model.addAttribute("newPasswordMsg", "新密码不能为空");
+            return "/site/setting";
+        }
+        if (oldPassword.equals(newPassword)) {
+            model.addAttribute("newPasswordMsg", "新密码不能和原始密码相同");
+            return "/site/setting";
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            model.addAttribute("confirmPasswordMsg", "两次输入的密码不一致");
+            return "/site/setting";
+        }
+        User user = hostHolder.getUser();
+        int userId = user.getId();
+        String realPassword = user.getPassword(); // 这里的 realPassword 是加密过的。
+        String salt = user.getSalt();
+        int status = userService.updatePassword(userId, realPassword, salt, oldPassword, newPassword); // status: 0 - fail; 1 - success;
+        if (status == 0) {
+            model.addAttribute("oldPasswordMsg", "输入的原始密码不正确");
+            return "/site/setting";
+        }
+        return "redirect:/logout"; // 重新登录
     }
 }
