@@ -190,4 +190,12 @@ public class AlphaController {
     Session 存储在服务器端（内存），可以存很多，数据类型无限制。 是 JavaEE标准
     分布式系统中，往往 session 不是用的很多。实际中分布式系统会把原本存到session中的数据存到sql或redis中
      */
+
+    // AJAX 实例
+    @RequestMapping(path = "/ajax", method = RequestMethod.POST)
+    @ResponseBody
+    public String testAjax(String name, int age) {
+        System.out.println(name + " + " + age);
+        return CommunityUtil.getJSONString(0, "操作成功");
+    }
 }
