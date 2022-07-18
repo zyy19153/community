@@ -167,4 +167,8 @@ public class UserService implements CommunityConstant {
         newPassword = CommunityUtil.md5(newPassword + salt); // 注意，使用 mapper 存的密码是已经加过密的密码
         return userMapper.updatePassword(userId, newPassword);
     }
+
+    public User findUserByName(String name) {
+        return userMapper.selectByName(name);
+    }
 }
