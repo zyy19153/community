@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.*;
  * @since 2022/7/15 - 10:47
  */
 @Mapper // 声明该类对象是一个数据访问对象，需要容器管理
+@Deprecated
 public interface LoginTicketMapper {
 
     // 小技巧，记得在非最后一个“”前的每一个sql中的最后加上一个空格，便于最后sql语句的拼接。
