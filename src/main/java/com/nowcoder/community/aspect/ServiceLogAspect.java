@@ -30,8 +30,11 @@ public class ServiceLogAspect {
     @Before("pointcut()")
     public void before(JoinPoint joinPoint) {
         // 用户[1.2.3.4],在[xxx]，访问了[com.nowcoder.community.service.xxx()]
-        ServletRequestAttributes attribtues = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attribtues.getRequest();
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            return; // 表明这是一次特殊的调用，一半service都是由controller来调用的，但是也会有特殊情况，比如消息处理的线程(eventConsumer)也会调用service
+        }
+        HttpServletRequest request = attributes.getRequest();
         String ip = request.getRemoteHost();
         String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String target = joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName();
