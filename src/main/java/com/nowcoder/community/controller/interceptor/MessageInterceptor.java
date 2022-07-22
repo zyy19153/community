@@ -30,7 +30,7 @@ public class MessageInterceptor implements HandlerInterceptor {
         if (user != null && modelAndView != null) {
             int letterUnreadCount = messageService.findLetterUnreadCount(user.getId(), null);
             int noticeUnreadCount = messageService.findNoticeUnreadCount(user.getId(), null);
-            modelAndView.addObject("addUnreadCount", letterUnreadCount + noticeUnreadCount);
+            modelAndView.addObject("allUnreadCount", letterUnreadCount + noticeUnreadCount);
         }
     }
 }
