@@ -3,22 +3,32 @@ package com.nowcoder.community;
 import com.nowcoder.community.dao.DiscussPostMapper;
 import com.nowcoder.community.dao.elasticsearch.DiscussPostRepository;
 import com.nowcoder.community.entity.DiscussPost;
-import org.apache.commons.lang3.builder.ToStringExclude;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.SearchResultMapper;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
+import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -106,19 +116,19 @@ public class ElasticsearchTests {
                         new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>"),
                         new HighlightBuilder.Field("content").preTags("<em>").postTags("</em>")
                 ).build();
-        Page<DiscussPost> page = elasticTemplate.queryForPage(searchQuery, dicussPost.class, new SearchResultMapper() {
-            public <T> AggregatePage<T> mapResults(SearchReponse reponse, Class<T> aclass, Pageable pageable) {
+        Page<DiscussPost> page = elasticTemplate.queryForPage(searchQuery, DiscussPost.class, new SearchResultMapper() {
+            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> aclass, Pageable pageable) {
                 SearchHits hits = response.getHits();
                 if (hits.getTotalHits() <= 0) {
                     return null;
                 }
-                List<DiscussPost> list = ArrayList<>();
-                for (SearchHits hit : hits) {
+                List<DiscussPost> list = new ArrayList<>();
+                for (SearchHit hit : hits) {
                     DiscussPost post = new DiscussPost();
                     String id = hit.getSourceAsMap().get("id").toString();
                     post.setId(Integer.valueOf(id));
                     String userId = hit.getSourceAsMap().get("userId").toString();
-                    post.setUserId(Integer.valueOd(userId));
+                    post.setUserId(Integer.valueOf(userId));
                     String title = hit.getSourceAsMap().get("title").toString();
                     post.setTitle(title);
                     String content = hit.getSourceAsMap().get("content").toString();
@@ -126,7 +136,7 @@ public class ElasticsearchTests {
                     String status = hit.getSourceAsMap().get("status").toString();
                     post.setStatus(Integer.valueOf(status));
                     String createTime = hit.getSourceAsMap().get("createTime").toString();
-                    post.setCreateTime(new Date(Long.valueOf(status)));
+                    post.setCreateTime(new Date(Long.valueOf(createTime)));
                     String commentCount = hit.getSourceAsMap().get("commentCount").toString();
                     post.setCommentCount(Integer.valueOf(commentCount));
                     // 处理高亮显示的结果
@@ -140,7 +150,7 @@ public class ElasticsearchTests {
                     }
                     list.add(post);
                 }
-                return new AggregatePageImpl(list, pageable, hits.getTotalHits(), response.getAggregations(), response.getScrollId(), hits.getMaxScore());
+                return new AggregatedPageImpl(list, pageable, hits.getTotalHits(), response.getAggregations(), response.getScrollId(), hits.getMaxScore());
             }
         });
         System.out.println(page.getTotalElements());

@@ -13,8 +13,8 @@ import java.util.Date;
  * @since 2022/7/13 - 15:03
  */
 @Data
-//@Document(indexName = "discusspost", type = "_doc", shards = 6, replicas = 3)
-@Document(indexName = "discusspost", shards = 6, replicas = 3)
+@Document(indexName = "discusspost", type = "_doc", shards = 6, replicas = 3)
+//@Document(indexName = "discusspost", shards = 6, replicas = 3)
 public class DiscussPost {
     @Id
     private int id;

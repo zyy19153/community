@@ -1,17 +1,18 @@
 package com.nowcoder.community;
 
 import com.nowcoder.community.util.SensitiveFilter;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-
-import java.io.OutputStream;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Hide on bush
  * @since 2022/7/16 - 18:04
  */
+@RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = CommunityApplication.class)
 public class SensitiveTests {

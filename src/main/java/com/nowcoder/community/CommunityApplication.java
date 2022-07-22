@@ -10,7 +10,7 @@ public class CommunityApplication {
 
     @PostConstruct
     public void init() {
-        // 解决netty启动冲突的问题
+        // 解决netty启动冲突的问题 es - redis
         System.setProperty("es.set.netty.runtime.available.processors", "false");
     }
 
